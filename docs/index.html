@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0f172a">
+<title>15-Story Window Tracker — Mobile Foreman App</title>
+<style>
+  :root {
+    --bg: #020617; --phone: #0f172a; --card: #1e293b; --border: #334155;
+    --text: #f8fafc; --muted: #94a3b8; --accent: #0284c7; --green: #16a34a;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); display: flex; justify-content: center;
+  }
+  .phone-shell {
+    width: 100%; max-width: 430px; min-height: 100vh; background: var(--phone);
+    border-left: 1px solid #1e293b; border-right: 1px solid #1e293b;
+    padding-bottom: 74px; position: relative;
+  }
+  header {
+    background: #020617; border-bottom: 2px solid var(--accent);
+    padding: 12px 14px; position: sticky; top: 0; z-index: 20;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  h1 { margin: 0; font-size: 15.5px; }
+  .sub { font-size: 11px; color: var(--muted); }
+  .content { padding: 12px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+  .kpi { background: var(--card); border: 1px solid var(--border); border-radius: 7px; padding: 7px 9px; text-align: center; }
+  .kpi .l { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+  .kpi .v { font-size: 17px; font-weight: 900; color: #38bdf8; margin-top: 2px; }
+  .fl-strip { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 8px; margin-bottom: 10px; }
+  .fl-btn {
+    flex: 0 0 auto; padding: 8px 12px; border-radius: 8px; border: 2px solid var(--border);
+    background: var(--card); color: var(--text); font-weight: 800; font-size: 12.5px; cursor: pointer;
+  }
+  .fl-btn.active { border-color: #38bdf8; background: #020617; }
+  .m-card { background: var(--card); border: 1px solid var(--border); border-radius: 9px; padding: 11px 12px; margin-bottom: 9px; font-size: 13px; }
+  .stage-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #020617; border: 1px solid var(--border); border-radius: 7px;
+    padding: 8px 10px; margin-bottom: 6px;
+  }
+  .stage-row .cnt { font-size: 18px; font-weight: 900; color: #38bdf8; }
+  .btn {
+    background: var(--accent); color: #fff; border: none; padding: 8px 11px;
+    border-radius: 7px; font-weight: 700; font-size: 12px; cursor: pointer;
+  }
+  .btn.grn { background: var(--green); }
+  .pal-wrap { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .pal { background: #020617; border: 1px solid #475569; padding: 3px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; color: #bae6fd; }
+  .hall-banner {
+    background: #020617; border: 2px dashed #fbbf24; border-radius: 8px;
+    padding: 9px 10px; text-align: center; color: #fde68a; font-weight: 800; font-size: 12px; margin: 10px 0;
+  }
+  .bottom-nav {
+    position: fixed; bottom: 0; width: 100%; max-width: 430px; background: #020617;
+    border-top: 2px solid var(--border); display: grid; grid-template-columns: repeat(3, 1fr);
+    z-index: 30;
+  }
+  .nav-btn {
+    background: none; border: none; color: var(--muted); padding: 11px 4px;
+    font-size: 11.5px; font-weight: 700; cursor: pointer; text-align: center;
+  }
+  .nav-btn.active { color: #fff; background: var(--accent); }
+</style>
+</head>
+<body>
+<div class="phone-shell">
+  <header>
+    <div>
+      <h1>15-STORY WINDOW TRACKER</h1>
+      <div class="sub">2,000 SF Warehouse &rarr; Install/Caulk &rarr; GC Hand-In</div>
+    </div>
+    <button class="btn" onclick="window.print()">Print</button>
+  </header>
+
+  <div class="content">
+    <div class="kpi-grid" id="kpiBar"></div>
+
+    <div id="tab-tower">
+      <div class="fl-strip" id="flStrip"></div>
+      <div id="flCard"></div>
+    </div>
+    <div id="tab-warehouse" style="display:none"></div>
+    <div id="tab-checklists" style="display:none"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="showTab('tower', this)">1. Floors 1–15</button>
+    <button class="nav-btn" onclick="showTab('warehouse', this)">2. 2,000 SF Whse</button>
+    <button class="nav-btn" onclick="showTab('checklists', this)">3. 3 Checklists</button>
+  </nav>
+</div>
+
+<script>
+const DATA = {"project_name": "15-Story Commercial High-Rise Window Logistics & 4-Gate Foreman Tracker (Madison, WI Workflow)", "warehouse": {"total_sq_ft": 2000, "layout_description": "2,000 sq ft facility split into two adjacent rooms (Room A: 1,000 sq ft Inbound Rows; Room B: 1,000 sq ft Weekly Jobsite Dispatch & Rows) connected by a Main Center Forklift Hallway AND a direct Room-to-Room Transfer Opening.", "pallet_width_ft": "6' 0\" to 6' 6\"", "row_spacing_ft": 9, "max_pallets_per_row": 8, "rooms": [{"room_id": "ROOM-A", "name": "Room A \u2014 Inbound Truck Unload & Primary Storage Rows (1,000 Sq Ft)", "connections": ["Main Center Forklift Hallway", "Direct Room-A-to-Room-B Transfer Opening"], "rows": [{"row_id": "A-R1 (0'\u20139')", "wall": "North Wall -> Center Line", "capacity": 8, "assigned_floors": "Floors 9\u201310 Window Pallets", "pallets_loaded": 8, "pallet_ids": ["PAL-09N-1", "PAL-09N-2", "PAL-09E-1", "PAL-09S-1", "PAL-09W-1", "PAL-10N-1", "PAL-10E-1", "PAL-10S-1"]}, {"row_id": "A-R2 (9'\u201318')", "wall": "North Wall -> Center Line", "capacity": 8, "assigned_floors": "Floors 11\u201312 Window Pallets", "pallets_loaded": 7, "pallet_ids": ["PAL-11N-1", "PAL-11E-1", "PAL-11S-1", "PAL-11W-1", "PAL-12N-1", "PAL-12E-1", "PAL-12S-1"]}, {"row_id": "A-R3 (18'\u201327')", "wall": "South Wall -> Center Line", "capacity": 8, "assigned_floors": "Floors 13\u201314 Window Pallets", "pallets_loaded": 6, "pallet_ids": ["PAL-13N-1", "PAL-13E-1", "PAL-13S-1", "PAL-14N-1", "PAL-14E-1", "PAL-14S-1"]}, {"row_id": "A-R4 (27'\u201336')", "wall": "South Wall -> Center Line", "capacity": 8, "assigned_floors": "Floor 15 Penthouse & Oversize 6'6\" Pallets", "pallets_loaded": 5, "pallet_ids": ["PAL-15N-1", "PAL-15E-1", "PAL-15S-1", "PAL-15W-1", "PAL-15PH-2"]}]}, {"room_id": "ROOM-B", "name": "Room B \u2014 Weekly Foreman Dispatch Rows & Jobsite Load-Out (1,000 Sq Ft)", "connections": ["Main Center Forklift Hallway (To Truck Dock)", "Direct Room-A-to-Room-B Transfer Opening"], "rows": [{"row_id": "B-R1 (0'\u20139')", "wall": "North Wall -> Center Line", "capacity": 8, "assigned_floors": "THIS WEEK'S DISPATCH \u2014 Floor 7 & Floor 8 (Ordered First-Off-Truck)", "pallets_loaded": 8, "pallet_ids": ["PAL-07N-1", "PAL-07E-1", "PAL-07S-1", "PAL-07W-1", "PAL-08N-1", "PAL-08E-1", "PAL-08S-1", "PAL-08W-1"]}, {"row_id": "B-R2 (9'\u201318')", "wall": "North Wall -> Center Line", "capacity": 8, "assigned_floors": "NEXT WEEK'S STAGING \u2014 Floor 9 Ready Pull", "pallets_loaded": 6, "pallet_ids": ["PAL-08-CRTYD", "PAL-09N-STAGE", "PAL-09E-STAGE", "PAL-09S-STAGE", "PAL-09W-STAGE", "PAL-09-CRTYD"]}, {"row_id": "B-R3 (18'\u201327')", "wall": "South Wall -> Center Line", "capacity": 8, "assigned_floors": "Replacement Glass / Warranty / Trim & Sill Pan Pallets", "pallets_loaded": 3, "pallet_ids": ["PAL-PAN-SILL", "PAL-REPL-06W", "PAL-CAULK-ROD"]}]}]}, "checklists": [{"area_id": "AREA-1", "title": "1. Warehouse Checklist (Off-Truck -> 9' Row Slot -> Weekly Dispatch Order)", "steps": ["Truck Unload & Manifest Check: Verify pallet width (6'0\" to 6'6\"), opening tags, and glass condition as pallet comes off flatbed.", "Row Slotting (9' Row Pitch = 7' Pallet Bay + 2' Clearance, Max 8 Pallets Deep): Slot pallet into assigned Room A row protruding from outer wall toward center machine hallway.", "Weekly Foreman Pull to Room B (Through Room-to-Room Transfer or Main Hallway): Restage next week's pallets into Room B in reverse load order so pallets arrive at the tower in exact floor-setting sequence."]}, {"area_id": "AREA-2", "title": "2. Jobsite Installation & Caulk/Finish Checklist (Staged Out of Way -> Set Crew -> Caulk Crew -> Ready for Drywall)", "steps": ["Floor Delivery & Pre-Planned Staging: Hoist pallets to assigned floor and spot in the pre-planned staging bay completely out of the path of metal-stud/MEP trades.", "Set Crew Installation: Set window frame into rough opening, laser level/plumb, shim, and anchor to spec -> Foreman logs opening as SET.", "Caulk & Finish Crew (Drywall-Ready Prep): Second crew caulks exterior/interior perimeter, installs backer rod/flashing/trim -> logs opening READY FOR DRYWALL."]}, {"area_id": "AREA-3", "title": "3. Final Foreman Multi-Stage Verification (Final Verify #1 -> Touch-Up Verify #2 -> 3rd Verify if Needed -> Hand In to GC)", "steps": ["Check 3A \u2014 Foreman Final Verify #1: Foreman walks every 'Ready for Drywall' window on the floor, checking caulk continuity, anchor heads, hardware lock, and drywall return clearance.", "Check 3B \u2014 Touch-Up Verify #2: Any punch item flagged in Check 3A gets touched up and re-walked by the foreman for 2nd sign-off.", "Check 3C \u2014 3rd Verify (When Required) & GC Turnover: If a stubborn leak/glass/frame issue takes a 3rd pass, track it in the 3rd-Verify queue until clean, then sign the floor over to the General Contractor."]}], "totals": {"total_windows": 468, "in_warehouse": 216, "staged_on_floor": 24, "set_by_install_crew": 30, "caulked_ready_for_drywall": 18, "foreman_final_verify_1": 12, "touchup_verify_2_gc_handed_in": 168, "third_verify_required": 3, "unaccounted": 0}, "floors": [{"floor": 1, "total_windows": 24, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 1 North Retail Bay (Cleared)", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 24, "third_verify_required": 0, "accounted_total": 24, "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"}, {"floor": 2, "total_windows": 32, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 2 East Core Alcove (Cleared)", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 32, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"}, {"floor": 3, "total_windows": 32, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 3 East Core Alcove (Cleared)", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 32, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"}, {"floor": 4, "total_windows": 32, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 4 East Core Alcove (Cleared)", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 32, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"}, {"floor": 5, "total_windows": 32, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 5 Center Corridor Bay", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 2, "touchup_verify_2_gc_handed_in": 30, "third_verify_required": 2, "accounted_total": 32, "blocker_note": "30 Handed to GC; 2 units on 3rd Touch-Up Verify (exterior perimeter bead re-tool)"}, {"floor": 6, "total_windows": 32, "warehouse_row": "Delivered Set", "floor_staging_zone": "Fl 6 Center Corridor Bay", "in_warehouse": 0, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 4, "foreman_final_verify_1": 10, "touchup_verify_2_gc_handed_in": 18, "third_verify_required": 1, "accounted_total": 32, "blocker_note": "18 Handed to GC; 10 at Foreman Final Verify #1; 4 Caulk Crew finishing today"}, {"floor": 7, "total_windows": 32, "warehouse_row": "Room B \u2014 Row B-R1", "floor_staging_zone": "Fl 7 West Elevator Lobby Bay (Out of Drywallers' Way)", "in_warehouse": 0, "staged_on_floor": 4, "set_by_install_crew": 14, "caulked_ready_for_drywall": 14, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "Set Crew finished 28; Caulk Crew has 14 ready for drywall; 4 staged on floor"}, {"floor": 8, "total_windows": 32, "warehouse_row": "Room B \u2014 Row B-R1", "floor_staging_zone": "Fl 8 West Elevator Lobby Bay (Pre-Planned Staging)", "in_warehouse": 4, "staged_on_floor": 12, "set_by_install_crew": 16, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "Set Crew actively setting North & East elevations (16 set, 12 staged on floor, 4 on tomorrow's truck)"}, {"floor": 9, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R1 -> Moving to B-R2", "floor_staging_zone": "Fl 9 West Elevator Lobby Bay", "in_warehouse": 24, "staged_on_floor": 8, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "First 2 pallets hoisted to Fl 9 staging zone; remaining 6 pallets staged in Room B Row B-R2 for Thursday truck"}, {"floor": 10, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R1", "floor_staging_zone": "Fl 10 West Elevator Lobby Bay", "in_warehouse": 32, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "In Warehouse Room A Row A-R1 (8-pallet stack)"}, {"floor": 11, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R2", "floor_staging_zone": "Fl 11 West Elevator Lobby Bay", "in_warehouse": 32, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "In Warehouse Room A Row A-R2"}, {"floor": 12, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R2", "floor_staging_zone": "Fl 12 West Elevator Lobby Bay", "in_warehouse": 32, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "In Warehouse Room A Row A-R2"}, {"floor": 13, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R3", "floor_staging_zone": "Fl 13 West Elevator Lobby Bay", "in_warehouse": 32, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "In Warehouse Room A Row A-R3"}, {"floor": 14, "total_windows": 32, "warehouse_row": "Room A \u2014 Row A-R3", "floor_staging_zone": "Fl 14 West Elevator Lobby Bay", "in_warehouse": 32, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 32, "blocker_note": "In Warehouse Room A Row A-R3"}, {"floor": 15, "total_windows": 28, "warehouse_row": "Room A \u2014 Row A-R4", "floor_staging_zone": "Fl 15 Penthouse Center Bay", "in_warehouse": 28, "staged_on_floor": 0, "set_by_install_crew": 0, "caulked_ready_for_drywall": 0, "foreman_final_verify_1": 0, "touchup_verify_2_gc_handed_in": 0, "third_verify_required": 0, "accounted_total": 28, "blocker_note": "In Warehouse Room A Row A-R4 (6'6\" wide penthouse pallets)"}]};
+let curFl = 6; // Default to active Floor 7 (index 6)
+
+function showTab(name, btn) {
+  ['tower','warehouse','checklists'].forEach(t => document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function recompute() {
+  const t = { total_windows:0, in_warehouse:0, staged_on_floor:0, set_by_install_crew:0, caulked_ready_for_drywall:0, foreman_final_verify_1:0, touchup_verify_2_gc_handed_in:0 };
+  DATA.floors.forEach(f => {
+    t.total_windows += f.total_windows; t.in_warehouse += f.in_warehouse;
+    t.staged_on_floor += f.staged_on_floor; t.set_by_install_crew += f.set_by_install_crew;
+    t.caulked_ready_for_drywall += f.caulked_ready_for_drywall;
+    t.foreman_final_verify_1 += f.foreman_final_verify_1;
+    t.touchup_verify_2_gc_handed_in += f.touchup_verify_2_gc_handed_in;
+  });
+  DATA.totals = t;
+}
+
+function renderKpis() {
+  recompute();
+  const t = DATA.totals;
+  document.getElementById('kpiBar').innerHTML = `
+    <div class="kpi"><div class="l">Warehouse</div><div class="v">${t.in_warehouse}</div></div>
+    <div class="kpi"><div class="l">Floor Staged</div><div class="v">${t.staged_on_floor}</div></div>
+    <div class="kpi"><div class="l">Set Crew</div><div class="v">${t.set_by_install_crew}</div></div>
+    <div class="kpi"><div class="l">Caulked/DW</div><div class="v">${t.caulked_ready_for_drywall}</div></div>
+    <div class="kpi"><div class="l">Verify #1</div><div class="v">${t.foreman_final_verify_1}</div></div>
+    <div class="kpi"><div class="l">GC Hand-In</div><div class="v" style="color:#4ade80">${t.touchup_verify_2_gc_handed_in}/${t.total_windows}</div></div>
+  `;
+}
+
+function renderFlStrip() {
+  document.getElementById('flStrip').innerHTML = DATA.floors.map((f, i) => `
+    <button class="fl-btn ${i===curFl?'active':''}" onclick="curFl=${i};renderFlStrip();renderFlCard()">
+      Fl ${f.floor} (${f.touchup_verify_2_gc_handed_in}/${f.total_windows})
+    </button>
+  `).join('');
+}
+
+function step(fromK, toK, n) {
+  const f = DATA.floors[curFl];
+  const m = Math.min(n, f[fromK]);
+  if (m <= 0) return;
+  f[fromK] -= m; f[toK] += m;
+  renderKpis(); renderFlStrip(); renderFlCard();
+}
+
+function renderFlCard() {
+  const f = DATA.floors[curFl];
+  document.getElementById('flCard').innerHTML = `
+    <div class="m-card" style="border-top:4px solid #38bdf8">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong style="font-size:17px">Floor ${f.floor} (${f.total_windows} Windows)</strong>
+        <span style="font-size:11.5px;color:#4ade80;font-weight:700">${f.warehouse_row}</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin:3px 0 8px">Staging Spot: ${f.floor_staging_zone}</div>
+
+      <div class="stage-row">
+        <div><strong>1. In 2,000 SF Warehouse</strong><div style="font-size:11px;color:var(--muted)">Sorted in 9' row (max 8 deep)</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cnt">${f.in_warehouse}</span>
+          ${f.in_warehouse>0 ? `<button class="btn" onclick="step('in_warehouse','staged_on_floor',4)">Deliver +4</button>` : ''}
+        </div>
+      </div>
+
+      <div class="stage-row">
+        <div><strong>2. Staged on Floor (Out of Way)</strong><div style="font-size:11px;color:var(--muted)">Ready for Set Crew</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cnt">${f.staged_on_floor}</span>
+          ${f.staged_on_floor>0 ? `<button class="btn" onclick="step('staged_on_floor','set_by_install_crew',4)">Set +4</button>` : ''}
+        </div>
+      </div>
+
+      <div class="stage-row">
+        <div><strong>3. Set by Install Crew</strong><div style="font-size:11px;color:var(--muted)">Foreman logged set; ready for Caulk Crew</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cnt">${f.set_by_install_crew}</span>
+          ${f.set_by_install_crew>0 ? `<button class="btn" onclick="step('set_by_install_crew','caulked_ready_for_drywall',4)">Caulk +4</button>` : ''}
+        </div>
+      </div>
+
+      <div class="stage-row">
+        <div><strong>4. Caulked &amp; Ready for Drywall</strong><div style="font-size:11px;color:var(--muted)">Awaiting Foreman Final Verify #1</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cnt">${f.caulked_ready_for_drywall}</span>
+          ${f.caulked_ready_for_drywall>0 ? `<button class="btn" onclick="step('caulked_ready_for_drywall','foreman_final_verify_1',4)">Verify #1 +4</button>` : ''}
+        </div>
+      </div>
+
+      <div class="stage-row">
+        <div><strong>5. Foreman Final Verify #1 Passed</strong><div style="font-size:11px;color:var(--muted)">Awaiting 2nd Touch-Up Verify</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cnt">${f.foreman_final_verify_1}</span>
+          ${f.foreman_final_verify_1>0 ? `<button class="btn grn" onclick="step('foreman_final_verify_1','touchup_verify_2_gc_handed_in',4)">Verify #2 &rarr; GC</button>` : ''}
+        </div>
+      </div>
+
+      <div class="stage-row" style="border-color:#16a34a">
+        <div><strong style="color:#4ade80">6. Verify #2/#3 Done &rarr; Handed to GC</strong><div style="font-size:11px;color:var(--muted)">${f.third_verify_required>0 ? f.third_verify_required+' unit(s) on 3rd Touch-Up Verify' : 'Signed over to General Contractor'}</div></div>
+        <span class="cnt" style="color:#4ade80">${f.touchup_verify_2_gc_handed_in}</span>
+      </div>
+
+      <div style="font-size:12px;color:#cbd5e1;margin-top:6px"><strong>Note:</strong> ${f.blocker_note}</div>
+    </div>
+  `;
+}
+
+function renderWarehouse() {
+  const wh = DATA.warehouse;
+  const rmHtml = (rm) => `
+    <div class="m-card" style="border-top:4px solid #38bdf8">
+      <div style="font-weight:900;color:#38bdf8;font-size:14.5px">${rm.name}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin:3px 0 8px">Pallets: ${wh.pallet_width_ft} wide &middot; Rows every ${wh.row_spacing_ft}' (7'+2') &middot; Max ${wh.max_pallets_per_row} pallets/row</div>
+      ${rm.rows.map(r => `
+        <div style="background:#020617;border-left:4px solid #38bdf8;padding:8px;border-radius:6px;margin-bottom:7px">
+          <div style="display:flex;justify-content:space-between;font-weight:800;font-size:12.5px">
+            <span>${r.row_id} (${r.wall})</span>
+            <span style="color:#4ade80">${r.pallets_loaded}/${r.capacity}</span>
+          </div>
+          <div style="font-size:11.5px;color:#cbd5e1;margin-top:2px">${r.assigned_floors}</div>
+          <div class="pal-wrap">${r.pallet_ids.map(p=>`<span class="pal">${p}</span>`).join('')}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  document.getElementById('tab-warehouse').innerHTML =
+    rmHtml(wh.rooms[0]) +
+    `<div class="hall-banner">MAIN CENTER MACHINE HALLWAY &amp; DIRECT ROOM-A &harr; ROOM-B TRANSFER DOOR<br><span style="font-weight:400;font-size:11px">Rows protrude from outer walls toward center line so machine grabs pallets 1-by-1</span></div>` +
+    rmHtml(wh.rooms[1]);
+}
+
+function renderChecklists() {
+  document.getElementById('tab-checklists').innerHTML = DATA.checklists.map(c => `
+    <div class="m-card">
+      <div style="font-weight:900;color:#38bdf8;font-size:14px;margin-bottom:6px">${c.title}</div>
+      ${c.steps.map((s, i) => `
+        <label style="display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-top:1px solid var(--border);font-size:12.5px;cursor:pointer">
+          <input type="checkbox" checked style="width:18px;height:18px;margin-top:2px">
+          <span><strong>#${i+1}:</strong> ${s}</span>
+        </label>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+renderKpis(); renderFlStrip(); renderFlCard(); renderWarehouse(); renderChecklists();
+</script>
+</body>
+</html>

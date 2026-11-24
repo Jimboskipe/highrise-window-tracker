@@ -1,0 +1,405 @@
+{
+  "project_name": "15-Story Commercial High-Rise Window Logistics & 4-Gate Foreman Tracker (Madison, WI Workflow)",
+  "warehouse": {
+    "total_sq_ft": 2000,
+    "layout_description": "2,000 sq ft facility split into two adjacent rooms (Room A: 1,000 sq ft Inbound Rows; Room B: 1,000 sq ft Weekly Jobsite Dispatch & Rows) connected by a Main Center Forklift Hallway AND a direct Room-to-Room Transfer Opening.",
+    "pallet_width_ft": "6' 0\" to 6' 6\"",
+    "row_spacing_ft": 9,
+    "max_pallets_per_row": 8,
+    "rooms": [
+      {
+        "room_id": "ROOM-A",
+        "name": "Room A \u2014 Inbound Truck Unload & Primary Storage Rows (1,000 Sq Ft)",
+        "connections": [
+          "Main Center Forklift Hallway",
+          "Direct Room-A-to-Room-B Transfer Opening"
+        ],
+        "rows": [
+          {
+            "row_id": "A-R1 (0'\u20139')",
+            "wall": "North Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "Floors 9\u201310 Window Pallets",
+            "pallets_loaded": 8,
+            "pallet_ids": [
+              "PAL-09N-1",
+              "PAL-09N-2",
+              "PAL-09E-1",
+              "PAL-09S-1",
+              "PAL-09W-1",
+              "PAL-10N-1",
+              "PAL-10E-1",
+              "PAL-10S-1"
+            ]
+          },
+          {
+            "row_id": "A-R2 (9'\u201318')",
+            "wall": "North Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "Floors 11\u201312 Window Pallets",
+            "pallets_loaded": 7,
+            "pallet_ids": [
+              "PAL-11N-1",
+              "PAL-11E-1",
+              "PAL-11S-1",
+              "PAL-11W-1",
+              "PAL-12N-1",
+              "PAL-12E-1",
+              "PAL-12S-1"
+            ]
+          },
+          {
+            "row_id": "A-R3 (18'\u201327')",
+            "wall": "South Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "Floors 13\u201314 Window Pallets",
+            "pallets_loaded": 6,
+            "pallet_ids": [
+              "PAL-13N-1",
+              "PAL-13E-1",
+              "PAL-13S-1",
+              "PAL-14N-1",
+              "PAL-14E-1",
+              "PAL-14S-1"
+            ]
+          },
+          {
+            "row_id": "A-R4 (27'\u201336')",
+            "wall": "South Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "Floor 15 Penthouse & Oversize 6'6\" Pallets",
+            "pallets_loaded": 5,
+            "pallet_ids": [
+              "PAL-15N-1",
+              "PAL-15E-1",
+              "PAL-15S-1",
+              "PAL-15W-1",
+              "PAL-15PH-2"
+            ]
+          }
+        ]
+      },
+      {
+        "room_id": "ROOM-B",
+        "name": "Room B \u2014 Weekly Foreman Dispatch Rows & Jobsite Load-Out (1,000 Sq Ft)",
+        "connections": [
+          "Main Center Forklift Hallway (To Truck Dock)",
+          "Direct Room-A-to-Room-B Transfer Opening"
+        ],
+        "rows": [
+          {
+            "row_id": "B-R1 (0'\u20139')",
+            "wall": "North Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "THIS WEEK'S DISPATCH \u2014 Floor 7 & Floor 8 (Ordered First-Off-Truck)",
+            "pallets_loaded": 8,
+            "pallet_ids": [
+              "PAL-07N-1",
+              "PAL-07E-1",
+              "PAL-07S-1",
+              "PAL-07W-1",
+              "PAL-08N-1",
+              "PAL-08E-1",
+              "PAL-08S-1",
+              "PAL-08W-1"
+            ]
+          },
+          {
+            "row_id": "B-R2 (9'\u201318')",
+            "wall": "North Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "NEXT WEEK'S STAGING \u2014 Floor 9 Ready Pull",
+            "pallets_loaded": 6,
+            "pallet_ids": [
+              "PAL-08-CRTYD",
+              "PAL-09N-STAGE",
+              "PAL-09E-STAGE",
+              "PAL-09S-STAGE",
+              "PAL-09W-STAGE",
+              "PAL-09-CRTYD"
+            ]
+          },
+          {
+            "row_id": "B-R3 (18'\u201327')",
+            "wall": "South Wall -> Center Line",
+            "capacity": 8,
+            "assigned_floors": "Replacement Glass / Warranty / Trim & Sill Pan Pallets",
+            "pallets_loaded": 3,
+            "pallet_ids": [
+              "PAL-PAN-SILL",
+              "PAL-REPL-06W",
+              "PAL-CAULK-ROD"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "checklists": [
+    {
+      "area_id": "AREA-1",
+      "title": "1. Warehouse Checklist (Off-Truck -> 9' Row Slot -> Weekly Dispatch Order)",
+      "steps": [
+        "Truck Unload & Manifest Check: Verify pallet width (6'0\" to 6'6\"), opening tags, and glass condition as pallet comes off flatbed.",
+        "Row Slotting (9' Row Pitch = 7' Pallet Bay + 2' Clearance, Max 8 Pallets Deep): Slot pallet into assigned Room A row protruding from outer wall toward center machine hallway.",
+        "Weekly Foreman Pull to Room B (Through Room-to-Room Transfer or Main Hallway): Restage next week's pallets into Room B in reverse load order so pallets arrive at the tower in exact floor-setting sequence."
+      ]
+    },
+    {
+      "area_id": "AREA-2",
+      "title": "2. Jobsite Installation & Caulk/Finish Checklist (Staged Out of Way -> Set Crew -> Caulk Crew -> Ready for Drywall)",
+      "steps": [
+        "Floor Delivery & Pre-Planned Staging: Hoist pallets to assigned floor and spot in the pre-planned staging bay completely out of the path of metal-stud/MEP trades.",
+        "Set Crew Installation: Set window frame into rough opening, laser level/plumb, shim, and anchor to spec -> Foreman logs opening as SET.",
+        "Caulk & Finish Crew (Drywall-Ready Prep): Second crew caulks exterior/interior perimeter, installs backer rod/flashing/trim -> logs opening READY FOR DRYWALL."
+      ]
+    },
+    {
+      "area_id": "AREA-3",
+      "title": "3. Final Foreman Multi-Stage Verification (Final Verify #1 -> Touch-Up Verify #2 -> 3rd Verify if Needed -> Hand In to GC)",
+      "steps": [
+        "Check 3A \u2014 Foreman Final Verify #1: Foreman walks every 'Ready for Drywall' window on the floor, checking caulk continuity, anchor heads, hardware lock, and drywall return clearance.",
+        "Check 3B \u2014 Touch-Up Verify #2: Any punch item flagged in Check 3A gets touched up and re-walked by the foreman for 2nd sign-off.",
+        "Check 3C \u2014 3rd Verify (When Required) & GC Turnover: If a stubborn leak/glass/frame issue takes a 3rd pass, track it in the 3rd-Verify queue until clean, then sign the floor over to the General Contractor."
+      ]
+    }
+  ],
+  "totals": {
+    "total_windows": 468,
+    "in_warehouse": 216,
+    "staged_on_floor": 24,
+    "set_by_install_crew": 30,
+    "caulked_ready_for_drywall": 18,
+    "foreman_final_verify_1": 12,
+    "touchup_verify_2_gc_handed_in": 168,
+    "third_verify_required": 3,
+    "unaccounted": 0
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "total_windows": 24,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 1 North Retail Bay (Cleared)",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 24,
+      "third_verify_required": 0,
+      "accounted_total": 24,
+      "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"
+    },
+    {
+      "floor": 2,
+      "total_windows": 32,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 2 East Core Alcove (Cleared)",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 32,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"
+    },
+    {
+      "floor": 3,
+      "total_windows": 32,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 3 East Core Alcove (Cleared)",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 32,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"
+    },
+    {
+      "floor": 4,
+      "total_windows": 32,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 4 East Core Alcove (Cleared)",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 32,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "100% Handed in to GC \u2014 Drywall Complete"
+    },
+    {
+      "floor": 5,
+      "total_windows": 32,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 5 Center Corridor Bay",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 2,
+      "touchup_verify_2_gc_handed_in": 30,
+      "third_verify_required": 2,
+      "accounted_total": 32,
+      "blocker_note": "30 Handed to GC; 2 units on 3rd Touch-Up Verify (exterior perimeter bead re-tool)"
+    },
+    {
+      "floor": 6,
+      "total_windows": 32,
+      "warehouse_row": "Delivered Set",
+      "floor_staging_zone": "Fl 6 Center Corridor Bay",
+      "in_warehouse": 0,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 4,
+      "foreman_final_verify_1": 10,
+      "touchup_verify_2_gc_handed_in": 18,
+      "third_verify_required": 1,
+      "accounted_total": 32,
+      "blocker_note": "18 Handed to GC; 10 at Foreman Final Verify #1; 4 Caulk Crew finishing today"
+    },
+    {
+      "floor": 7,
+      "total_windows": 32,
+      "warehouse_row": "Room B \u2014 Row B-R1",
+      "floor_staging_zone": "Fl 7 West Elevator Lobby Bay (Out of Drywallers' Way)",
+      "in_warehouse": 0,
+      "staged_on_floor": 4,
+      "set_by_install_crew": 14,
+      "caulked_ready_for_drywall": 14,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "Set Crew finished 28; Caulk Crew has 14 ready for drywall; 4 staged on floor"
+    },
+    {
+      "floor": 8,
+      "total_windows": 32,
+      "warehouse_row": "Room B \u2014 Row B-R1",
+      "floor_staging_zone": "Fl 8 West Elevator Lobby Bay (Pre-Planned Staging)",
+      "in_warehouse": 4,
+      "staged_on_floor": 12,
+      "set_by_install_crew": 16,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "Set Crew actively setting North & East elevations (16 set, 12 staged on floor, 4 on tomorrow's truck)"
+    },
+    {
+      "floor": 9,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R1 -> Moving to B-R2",
+      "floor_staging_zone": "Fl 9 West Elevator Lobby Bay",
+      "in_warehouse": 24,
+      "staged_on_floor": 8,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "First 2 pallets hoisted to Fl 9 staging zone; remaining 6 pallets staged in Room B Row B-R2 for Thursday truck"
+    },
+    {
+      "floor": 10,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R1",
+      "floor_staging_zone": "Fl 10 West Elevator Lobby Bay",
+      "in_warehouse": 32,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "In Warehouse Room A Row A-R1 (8-pallet stack)"
+    },
+    {
+      "floor": 11,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R2",
+      "floor_staging_zone": "Fl 11 West Elevator Lobby Bay",
+      "in_warehouse": 32,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "In Warehouse Room A Row A-R2"
+    },
+    {
+      "floor": 12,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R2",
+      "floor_staging_zone": "Fl 12 West Elevator Lobby Bay",
+      "in_warehouse": 32,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "In Warehouse Room A Row A-R2"
+    },
+    {
+      "floor": 13,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R3",
+      "floor_staging_zone": "Fl 13 West Elevator Lobby Bay",
+      "in_warehouse": 32,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "In Warehouse Room A Row A-R3"
+    },
+    {
+      "floor": 14,
+      "total_windows": 32,
+      "warehouse_row": "Room A \u2014 Row A-R3",
+      "floor_staging_zone": "Fl 14 West Elevator Lobby Bay",
+      "in_warehouse": 32,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 32,
+      "blocker_note": "In Warehouse Room A Row A-R3"
+    },
+    {
+      "floor": 15,
+      "total_windows": 28,
+      "warehouse_row": "Room A \u2014 Row A-R4",
+      "floor_staging_zone": "Fl 15 Penthouse Center Bay",
+      "in_warehouse": 28,
+      "staged_on_floor": 0,
+      "set_by_install_crew": 0,
+      "caulked_ready_for_drywall": 0,
+      "foreman_final_verify_1": 0,
+      "touchup_verify_2_gc_handed_in": 0,
+      "third_verify_required": 0,
+      "accounted_total": 28,
+      "blocker_note": "In Warehouse Room A Row A-R4 (6'6\" wide penthouse pallets)"
+    }
+  ]
+}
